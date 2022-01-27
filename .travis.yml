@@ -1,5 +1,4 @@
 # Travis Flow:
-
 language: generic
 sudo: required
 
@@ -24,5 +23,13 @@ after_success:
   - docker build -t mrdock/multi-server ./server
   - docker build -t mrdock/multi-worker ./worker
 
-# Push all to docker hub
+# Log in to docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+# Push all built images to docker hub
+  - docker push mrdock/multi-client
+  - docker push mrdock/multi-nginx
+  - docker push mrdock/multi-server
+  - docker push mrdock/multi-worker
+
 # Tell Elastic Beanstalk to update
