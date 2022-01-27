@@ -1,0 +1,28 @@
+# Travis Flow:
+
+language: generic
+sudo: required
+
+# Specify docker as a dependency
+services:
+  - docker
+
+# Build test version of React project 
+# # for now, we only have tests for this repo, but we can add tests for server and worker
+# # would add `- docker build -t mrdock/server-test -f ./server/tests.js ./server` under `before_install`, for ex
+before_install:
+  - docker build -t mrdock/react-test -f ./client/Dockerfile.dev ./client
+
+# Run tests
+script:
+  - docker run -e CI=true mrdock/react-test npm test
+
+# Build prod versions of all projects
+after_success:
+  - docker build -t mrdock/multi-client ./client
+  - docker build -t mrdock/multi-nginx ./nginx
+  - docker build -t mrdock/multi-server ./server
+  - docker build -t mrdock/multi-worker ./worker
+
+# Push all to docker hub
+# Tell Elastic Beanstalk to update
